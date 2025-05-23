@@ -17,8 +17,26 @@ jobs:
           Import-Module dbatools
           Invoke-DbaQuery -SqlInstance ${{ github.event.inputs.sqlserverinstancename }} -Query 'select name from sysdatabases'
 
+      - name: Restart all SQL Services on target machine
+        shell: powershell
+        run: |
+          Import-Module dbatools
+          $sqlInstance = '${{ github.event.inputs.sqlserverinstancename }}'
+          if ($sqlInstance -like '*\\*') {
+            $computerName = $sqlInstance.Split("\\")[0]
+          } else {
+            $computerName = $sqlInstance
+          }
+          Restart-DbaService -ComputerName $computerName -Type Engine,Agent -Force
+
       - name: Get current disk space
         shell: powershell
         run: |
           Import-Module dbatools
-          Get-DbaDiskSpace
+          $sqlInstance = '${{ github.event.inputs.sqlserverinstancename }}'
+          if ($sqlInstance -like '*\\*') {
+            $computerName = $sqlInstance.Split("\\")[0]
+          } else {
+            $computerName = $sqlInstance
+          }
+          Get-DbaDiskSpace -ComputerName $computerName
