@@ -12,19 +12,20 @@ jobs:
     runs-on: [self-hosted, windows]
     steps:
       - name: Install DBATools
-        shell: pwsh
+        shell: powershell
         run: |
           Install-Module -Name dbatools -Force -Scope CurrentUser
           Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register
           Set-DbatoolsConfig -FullName sql.connection.encrypt -Value $false -Register
 
       - name: Import DBATools and run query
-        shell: pwsh
+        shell: powershell
         run: |
           Import-Module dbatools
           Invoke-DbaQuery -SqlInstance ${{ github.event.inputs.sqlserverinstancename }} -Query 'select name from sysdatabases'
 
       - name: Get current disk space
-        shell: pwsh
+        shell: powershell
         run: |
+          Import-Module dbatools
           Get-DbaDiskSpace
