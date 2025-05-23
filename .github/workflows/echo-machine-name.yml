@@ -5,7 +5,7 @@ on:
 
 jobs:
   echo-machine-name:
-    runs-on: [self-hosted, GitHubActions-Demo-SelfHosted]
+    runs-on: [self-hosted, windows]
     steps:
       - name: Echo PC Name
         run: |
