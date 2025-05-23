@@ -28,7 +28,13 @@ jobs:
       - name: Show a warning but continue
         run: |
           echo "::warning::This is a warning, but the workflow will continue."
+      - name: This step runs after the warning
+        run: |
+          echo "This step runs after the warning and before the failure."
       - name: Fail the workflow with an error
         run: |
           echo "::error::This is a failure, the workflow will stop here."
           exit 1
+      - name: This step will not run
+        run: |
+          echo "You should not see this message because the previous step fails the workflow."
