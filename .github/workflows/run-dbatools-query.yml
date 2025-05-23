@@ -12,8 +12,7 @@ jobs:
     runs-on: [self-hosted, windows]
     environment:
       name: approval-required
-
-
+    steps:
       - name: Import DBATools and run query
         shell: powershell
         run: |
@@ -40,4 +39,3 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong getting disk space.'
             exit 1
-         
