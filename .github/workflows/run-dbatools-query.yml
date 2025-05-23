@@ -15,7 +15,12 @@ jobs:
         shell: powershell
         run: |
           Import-Module dbatools
-          Invoke-DbaQuery -SqlInstance ${{ github.event.inputs.sqlserverinstancename }} -Query 'select name from sysdatabases'
+          try {
+            Invoke-DbaQuery -SqlInstance ${{ github.event.inputs.sqlserverinstancename }} -Query 'select name from sysdatabases' -EnableException
+          } catch {
+            Write-Host 'Error: Something went wrong running Invoke-DbaQuery.'
+            exit 1
+          }
 
       - name: Restart all SQL Services on target machine
         shell: powershell
@@ -27,7 +32,12 @@ jobs:
           } else {
             $computerName = $sqlInstance
           }
-          Restart-DbaService -ComputerName $computerName -Type Engine,Agent -Force
+          try {
+            Restart-DbaService -ComputerName $computerName -Type Engine,Agent -Force -EnableException
+          } catch {
+            Write-Host 'Error: Something went wrong restarting SQL Services.'
+            exit 1
+          }
 
       - name: Get current disk space
         shell: powershell
@@ -39,4 +49,9 @@ jobs:
           } else {
             $computerName = $sqlInstance
           }
-          Get-DbaDiskSpace -ComputerName $computerName
+          try {
+            Get-DbaDiskSpace -ComputerName $computerName -EnableException
+          } catch {
+            Write-Host 'Error: Something went wrong getting disk space.'
+            exit 1
+          }
