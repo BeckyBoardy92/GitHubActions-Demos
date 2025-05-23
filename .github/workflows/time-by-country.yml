@@ -1,0 +1,23 @@
+name: Get Time by Country
+
+on:
+  workflow_dispatch:
+    inputs:
+      location:
+        description: 'Country name or UTC offset (e.g., UTC+2)'
+        required: true
+        default: 'UTC'
+
+jobs:
+  get-time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Get current time
+        run: |
+          python scripts/get_time.py "${{ github.event.inputs.location }}"
