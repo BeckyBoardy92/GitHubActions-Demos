@@ -1,0 +1,12 @@
+name: Echo Runner Machine Name
+
+on:
+  workflow_dispatch:
+
+jobs:
+  echo-machine-name:
+    runs-on: [self-hosted, GitHubActions-Demo-SelfHosted]
+    steps:
+      - name: Echo PC Name
+        run: |
+          echo "Runner machine name: $COMPUTERNAME"
