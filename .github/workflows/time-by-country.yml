@@ -25,3 +25,10 @@ jobs:
       - name: Get current time for country
         run: |
           python scripts/get_time.py "${{ github.event.inputs.country }}"
+      - name: Show a warning but continue
+        run: |
+          echo "::warning::This is a warning, but the workflow will continue."
+      - name: Fail the workflow with an error
+        run: |
+          echo "::error::This is a failure, the workflow will stop here."
+          exit 1
