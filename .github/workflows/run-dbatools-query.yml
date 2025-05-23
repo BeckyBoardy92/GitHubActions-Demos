@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  run-dbatools-query:
+  show-variables:
     runs-on: [self-hosted, windows]
     steps:
       - name: Output all workflow variables
@@ -22,6 +22,10 @@ jobs:
           Write-Host ""
           Write-Host "GitHub Context:"
           Write-Host "${{ toJson(github) }}"
+
+  run-dbatools-query:
+    runs-on: [self-hosted, windows]
+    needs: show-variables
     environment:
       name: approval-required
     steps:
@@ -34,6 +38,7 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong running Invoke-DbaQuery.'
             exit 1
+          }
 
       - name: Get current disk space
         shell: powershell
