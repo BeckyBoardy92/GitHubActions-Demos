@@ -10,6 +10,18 @@ on:
 jobs:
   run-dbatools-query:
     runs-on: [self-hosted, windows]
+    steps:
+      - name: Output all workflow variables
+        shell: powershell
+        run: |
+          Write-Host "Workflow Inputs:"
+          Write-Host "  sqlserverinstancename: ${{ github.event.inputs.sqlserverinstancename }}"
+          Write-Host ""
+          Write-Host "Environment Variables:"
+          Get-ChildItem Env: | ForEach-Object { Write-Host "  $($_.Name)=$($_.Value)" }
+          Write-Host ""
+          Write-Host "GitHub Context:"
+          Write-Host "${{ toJson(github) }}"
     environment:
       name: approval-required
     steps:
@@ -22,7 +34,6 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong running Invoke-DbaQuery.'
             exit 1
-          }
 
       - name: Get current disk space
         shell: powershell
@@ -39,4 +50,3 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong getting disk space.'
             exit 1
-          }
