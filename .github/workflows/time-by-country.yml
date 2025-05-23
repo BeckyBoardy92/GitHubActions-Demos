@@ -1,15 +1,15 @@
-name: Get Time by Country
+name: Country Time
 
 on:
   workflow_dispatch:
     inputs:
-      location:
-        description: 'Country name or UTC offset (e.g., UTC+2)'
+      country:
+        description: 'Country name (e.g., Japan, Brazil, United Kingdom)'
         required: true
-        default: 'UTC'
+        default: 'Japan'
 
 jobs:
-  get-time:
+  get-country-time:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,6 +18,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Get current time
+      - name: Install dependencies
         run: |
-          python scripts/get_time.py "${{ github.event.inputs.location }}"
+          python -m pip install --upgrade pip
+          pip install pytz countryinfo
+      - name: Get current time for country
+        run: |
+          python scripts/get_time.py "${{ github.event.inputs.country }}"
