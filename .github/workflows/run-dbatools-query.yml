@@ -25,23 +25,6 @@ jobs:
             exit 1
           }
 
-      - name: Restart all SQL Services on target machine
-        shell: powershell
-        run: |
-          Import-Module dbatools
-          $sqlInstance = '${{ github.event.inputs.sqlserverinstancename }}'
-          if ($sqlInstance -like '*\\*') {
-            $computerName = $sqlInstance.Split("\\")[0]
-          } else {
-            $computerName = $sqlInstance
-          }
-          try {
-            Restart-DbaService -ComputerName $computerName -Type Engine,Agent -Force -EnableException
-          } catch {
-            Write-Host 'Error: Something went wrong restarting SQL Services.'
-            exit 1
-          }
-
       - name: Get current disk space
         shell: powershell
         run: |
