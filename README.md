@@ -54,5 +54,34 @@ python scripts/get_time.py "United Kingdom"
 - Python 3.x
 - `pytz` and `countryinfo` libraries (install with `pip install pytz countryinfo`)
 
+## Approval Gates in GitHub Actions
+
+Some workflows in this repository use an approval gate to require manual confirmation before continuing with potentially sensitive or impactful steps (such as running queries or restarting services).
+
+### How Approval Gates Work
+
+- When the workflow reaches the approval step, it will pause and wait for a designated user (the workflow initiator by default) to manually approve or reject the continuation.
+- The workflow will show a pending status in the Actions UI with a prompt to approve or reject.
+- Only after approval will the workflow proceed to the next steps.
+- If rejected, the workflow will stop and no further actions will be taken.
+
+### Example (using trstringer/manual-approval)
+
+- The approval step uses the `trstringer/manual-approval` action.
+- The workflow outputs all parameters used at the start, then pauses for approval.
+- You will see a button in the GitHub Actions UI to approve or reject the workflow.
+
+#### Typical Workflow Sequence
+1. Workflow is triggered and parameters are displayed in the logs.
+2. Workflow pauses at the approval step and waits for manual input.
+3. Approver reviews the parameters and instructions, then clicks **Approve** or **Reject**.
+4. If approved, the workflow continues to the next steps (e.g., running queries, restarting services).
+5. If rejected, the workflow stops immediately.
+
+### Why Use Approval Gates?
+- To prevent accidental or unauthorized execution of critical operations.
+- To allow a human to review parameters and context before proceeding.
+- To add an extra layer of safety for workflows that interact with production systems or sensitive resources.
+
 ## License
 MIT
