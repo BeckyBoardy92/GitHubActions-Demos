@@ -18,10 +18,13 @@ jobs:
           Write-Host "  sqlserverinstancename: ${{ github.event.inputs.sqlserverinstancename }}"
           Write-Host ""
           Write-Host "Environment Variables:"
-          Get-ChildItem Env: | ForEach-Object { Write-Host "  $($_.Name)=$($_.Value)" }
+          Get-ChildItem Env: | ForEach-Object { Write-Host ("  " + $_.Name + "=" + $_.Value) }
           Write-Host ""
           Write-Host "GitHub Context:"
-          Write-Host "${{ toJson(github) }}"
+          $githubContext = @"
+${{ toJson(github) }}
+"@
+          Write-Host $githubContext
 
   run-dbatools-query:
     runs-on: [self-hosted, windows]
