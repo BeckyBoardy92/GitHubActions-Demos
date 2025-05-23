@@ -6,6 +6,8 @@ on:
 jobs:
   echo-machine-name:
     runs-on: [self-hosted, windows]
+    environment:
+      name: approval-required
     steps:
       - name: Echo PC Name
         run: |

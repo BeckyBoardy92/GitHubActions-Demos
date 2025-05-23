@@ -10,19 +10,9 @@ on:
 jobs:
   run-dbatools-query:
     runs-on: [self-hosted, windows]
-    steps:
-      - name: Output parameters used
-        shell: powershell
-        run: |
-          Write-Host "Parameters used in this run:"
-          Write-Host "  sqlserverinstancename: ${{ github.event.inputs.sqlserverinstancename }}"
+    environment:
+      name: approval-required
 
-      - name: Await manual approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: ${{ github.actor }}
-          instructions: 'Please approve to continue with the workflow.'
 
       - name: Import DBATools and run query
         shell: powershell
@@ -67,4 +57,4 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong getting disk space.'
             exit 1
-          }
+         
