@@ -11,13 +11,6 @@ jobs:
   run-dbatools-query:
     runs-on: [self-hosted, windows]
     steps:
-      - name: Install DBATools
-        shell: powershell
-        run: |
-          Install-Module -Name dbatools -Force -Scope CurrentUser
-          Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register
-          Set-DbatoolsConfig -FullName sql.connection.encrypt -Value $false -Register
-
       - name: Import DBATools and run query
         shell: powershell
         run: |
