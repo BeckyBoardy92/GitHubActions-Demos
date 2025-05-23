@@ -1,39 +1,50 @@
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import pytz
 from countryinfo import CountryInfo
 
-# Get country from command line argument
-if len(sys.argv) < 2:
-    print("Usage: python get_time.py <Country Name>")
-    sys.exit(1)
+# Usage: python get_time.py <country>
 
-country_name = sys.argv[1]
-
-try:
-    country = CountryInfo(country_name)
-    timezones = country.timezones()
-    if not timezones:
-        print(f"No timezone found for {country_name}.")
-        sys.exit(1)
-    # Use the first timezone
-    tz_name = timezones[0]
+def get_time_by_country(country):
     try:
-        tz = pytz.timezone(tz_name)
-    except Exception:
-        # Handle UTC offset timezones like 'UTC+09:00'
-        if tz_name.startswith('UTC'):
-            offset = tz_name.replace('UTC', '')
-            # Convert '+09:00' to -9 for Etc/GMT-9 (sign is reversed)
-            sign = '-' if '+' in offset else '+'
-            hours = int(offset[1:3])
-            tz_str = f'Etc/GMT{sign}{hours}'
-            tz = pytz.timezone(tz_str)
+        info = CountryInfo(country)
+        capital = info.capital()
+        if not capital:
+            raise Exception("No capital found for country.")
+        # Try to find a timezone for the capital city
+        from pytz import country_timezones, all_timezones
+        country_code = info.iso()['alpha2']
+        timezones = country_timezones.get(country_code)
+        # Prefer a timezone that contains the capital name, else fallback to first
+        tz_name = None
+        if timezones:
+            for tz in timezones:
+                if capital.replace(' ', '_') in tz:
+                    tz_name = tz
+                    break
+            if not tz_name:
+                tz_name = timezones[0]
         else:
-            print(f"Unknown timezone format: {tz_name}")
-            sys.exit(1)
-    now = datetime.now(tz)
-    print(f"Current time in {country_name} ({tz.zone}): {now.strftime('%Y-%m-%d %H:%M:%S')}")
-except Exception as e:
-    print(f"Error: {e}")
-    sys.exit(1)
+            # Fallback: try to find a timezone by capital name
+            for tz in all_timezones:
+                if capital.replace(' ', '_') in tz:
+                    tz_name = tz
+                    break
+        if not tz_name:
+            raise Exception("No timezone found for capital city.")
+        tz = pytz.timezone(tz_name)
+        now = datetime.now(tz)
+        print(f"Current time in {country} ({tz_name}): {now.strftime('%Y-%m-%d %H:%M:%S')}")
+    except Exception as e:
+        print(f"Invalid country or timezone: {country}. Error: {e}")
+        sys.exit(1)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python get_time.py <country>")
+        sys.exit(1)
+    country = sys.argv[1]
+    get_time_by_country(country)
+
+if __name__ == "__main__":
+    main()
