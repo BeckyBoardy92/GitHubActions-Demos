@@ -39,3 +39,4 @@ jobs:
           } catch {
             Write-Host 'Error: Something went wrong getting disk space.'
             exit 1
+          }
