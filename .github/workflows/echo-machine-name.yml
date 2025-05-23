@@ -9,4 +9,4 @@ jobs:
     steps:
       - name: Echo PC Name
         run: |
-          echo "Runner machine name: $COMPUTERNAME"
+          echo "Runner machine name: $env:COMPUTERNAME"
