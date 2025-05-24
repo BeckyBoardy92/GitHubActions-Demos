@@ -28,6 +28,12 @@ jobs:
           $envCategory = "${{ github.event.inputs.environmentcategory }}"
           $expectedPatch = "${{ github.event.inputs.expectedsqlcupatch }}"
           $date = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'
+          $outputDir = 'C:\DBA'
+          if (-not (Test-Path $outputDir)) {
+            New-Item -Path $outputDir -ItemType Directory | Out-Null
+          }
+          # Clean up files older than 1 month
+          Get-ChildItem -Path $outputDir -Filter 'PeerCheckResults_*.csv' | Where-Object { $_.LastWriteTime -lt (Get-Date).AddMonths(-1) } | Remove-Item -Force
           foreach ($instance in $instances) {
             Write-Host "Running PeerCheck.SQL on $instance with EnvironmentCategory=$envCategory and ExpectedSQLCUPatch=$expectedPatch"
             $query = Get-Content -Raw -Path './scripts/PeerCheck.SQL'
@@ -36,7 +42,7 @@ jobs:
               $results = Invoke-DbaQuery -SqlInstance $instance -Query $query -EnableException
               $serverName = $results[0].ServerName
               $instanceName = $instance -replace '[\\/]', '_'
-              $csvPath = "./Peer check results/PeerCheckResults_${serverName}_${instanceName}_$date.csv"
+              $csvPath = "$outputDir\PeerCheckResults_${serverName}_${instanceName}_$date.csv"
               $results | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
               Write-Host "Results exported to $csvPath"
             } catch {
