@@ -26,5 +26,12 @@ jobs:
           $expectedPatch = "${{ github.event.inputs.expectedsqlcupatch }}"
           foreach ($instance in $instances) {
             Write-Host "Running PeerCheck.SQL on $instance with EnvironmentCategory=$envCategory and ExpectedSQLCUPatch=$expectedPatch"
-            sqlcmd -S $instance -i ./scripts/PeerCheck.SQL -v EnvironmentCategory="$envCategory" ExpectedSQLCUPatch="$expectedPatch"
+            $query = Get-Content -Raw -Path './scripts/PeerCheck.SQL'
+            $query = $query -replace '\$\(EnvironmentCategory\)', $envCategory -replace '\$\(ExpectedSQLPatch\)', $expectedPatch
+            try {
+              Invoke-DbaQuery -SqlInstance $instance -Query $query -EnableException
+            } catch {
+              Write-Host "Error: Failed to run PeerCheck.SQL on $instance."
+              exit 1
+            }
           }
