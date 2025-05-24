@@ -1,4 +1,4 @@
-name: Run PeerCheck SQL Script
+name: Run SQL Server PeerCheck
 
 on:
   workflow_dispatch:
