@@ -16,7 +16,7 @@ Declare @SQLVersion varchar(max) = @@version
 
 if @EnvironmentCategory = 'Prd'
 begin
-if @SQLVersion LIKE '%' + @ExpectedSQLPatch + '%' and @SQLEdition like '%Enerprise%'
+if @SQLVersion LIKE '%' + @ExpectedSQLPatch + '%' and @SQLEdition like '%Enterprise%'
 insert into #PeerCheckResults
 select 'SQL Patch Level Check' as PeerCheck, CONCAT(substring(@SQLVersion,1,(charindex('(X64)',@SQLVersion,1)+LEN('X64)'))-1),',',@SQLEDITION) AS RESULTS, 'SUCCESS' as Outcome
 else
@@ -198,12 +198,18 @@ SET @body = @body + N'</table></body></html>';
 SET @subject = 'Peer Check Results for ' + @servername;
 
 -- Send the email (replace profile and recipients as needed)
-EXEC msdb.dbo.sp_send_dbmail
-    @profile_name = 'GmailProfile1',
-    @recipients = 'rebeccamboardman@gmail.com',
-    @subject = @subject,
-    @body = @body,
-    @body_format = 'HTML';
+BEGIN TRY
+    EXEC msdb.dbo.sp_send_dbmail
+        @profile_name = 'GmailProfile1',
+        @recipients = 'rebeccamboardman@gmail.com',
+        @subject = @subject,
+        @body = @body,
+        @body_format = 'HTML';
+END TRY
+BEGIN CATCH
+    INSERT INTO #PeerCheckResults (PeerCheck, Results, outcome)
+    VALUES ('Script Error', ERROR_MESSAGE(), 'FAIL');
+END CATCH;
 
 
 select * from #PeerCheckResults
