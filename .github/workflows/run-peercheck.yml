@@ -1,0 +1,30 @@
+name: Run PeerCheck SQL Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      sqinstancenames:
+        description: 'Comma-separated list of SQL Server instance names (e.g., SERVER1,SERVER2)'
+        required: true
+      environmentcategory:
+        description: 'Environment category (dev or prd)'
+        required: true
+        default: 'dev'
+      expectedsqlcupatch:
+        description: 'Expected SQL CU Patch (e.g., CU19)'
+        required: true
+
+jobs:
+  run-peercheck:
+    runs-on: [self-hosted, windows]
+    steps:
+      - name: Run PeerCheck.SQL on all instances
+        shell: powershell
+        run: |
+          $instances = "${{ github.event.inputs.sqinstancenames }}" -split ','
+          $envCategory = "${{ github.event.inputs.environmentcategory }}"
+          $expectedPatch = "${{ github.event.inputs.expectedsqlcupatch }}"
+          foreach ($instance in $instances) {
+            Write-Host "Running PeerCheck.SQL on $instance with EnvironmentCategory=$envCategory and ExpectedSQLCUPatch=$expectedPatch"
+            sqlcmd -S $instance -i scripts/PeerCheck.SQL -v EnvironmentCategory="$envCategory" ExpectedSQLCUPatch="$expectedPatch"
+          }
