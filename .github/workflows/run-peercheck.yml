@@ -18,6 +18,9 @@ jobs:
   run-peercheck:
     runs-on: [self-hosted, windows]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Run PeerCheck.SQL on all instances
         shell: powershell
         run: |
