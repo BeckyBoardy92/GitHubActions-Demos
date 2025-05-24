@@ -1,6 +1,6 @@
 -- Accept variables from sqlcmd or :setvar
-:setvar EnvironmentCategory Prd
-:setvar ExpectedSQLPatch CU19
+-- :setvar EnvironmentCategory Prd
+-- :setvar ExpectedSQLPatch CU19
 
 DECLARE @EnvironmentCategory NVARCHAR(20) = '$(EnvironmentCategory)';
 DECLARE @ExpectedSQLPatch VARCHAR(5) = '$(ExpectedSQLPatch)';
