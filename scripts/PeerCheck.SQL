@@ -213,18 +213,6 @@ BEGIN CATCH
 END CATCH;
 
 
--- Ensure C:\DBA directory exists and save results to CSV there
-EXEC xp_cmdshell 'IF NOT EXIST "C:\DBA" mkdir "C:\DBA"';
-
-DECLARE @servername NVARCHAR(128) = CAST(SERVERPROPERTY('MachineName') AS NVARCHAR(128));
-DECLARE @instancename NVARCHAR(128) = CAST(SERVERPROPERTY('ServerName') AS NVARCHAR(128));
-DECLARE @datetime NVARCHAR(32) = REPLACE(CONVERT(NVARCHAR(20), GETDATE(), 120), ':', '-');
-DECLARE @csvPath NVARCHAR(4000) = 'C:\DBA\PeerCheckResults_' + @servername + '_' + @instancename + '_' + @datetime + '.csv';
-
-DECLARE @bcpCommand NVARCHAR(4000) = 'bcp "SELECT PeerCheck, Results, outcome FROM tempdb..#PeerCheckResults" queryout "' + @csvPath + '" -c -t, -T -S ' + @instancename;
-
-EXEC xp_cmdshell @bcpCommand;
-
 select * from #PeerCheckResults
 DROP TABLE #PeerCheckResults
 

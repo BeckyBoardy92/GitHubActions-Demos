@@ -21,18 +21,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run PeerCheck.SQL on all instances
+      - name: Run PeerCheck.SQL on all instances and export results
         shell: powershell
         run: |
           $instances = "${{ github.event.inputs.sqinstancenames }}" -split ','
           $envCategory = "${{ github.event.inputs.environmentcategory }}"
           $expectedPatch = "${{ github.event.inputs.expectedsqlcupatch }}"
+          $date = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'
           foreach ($instance in $instances) {
             Write-Host "Running PeerCheck.SQL on $instance with EnvironmentCategory=$envCategory and ExpectedSQLCUPatch=$expectedPatch"
             $query = Get-Content -Raw -Path './scripts/PeerCheck.SQL'
             $query = $query -replace '\$\(EnvironmentCategory\)', $envCategory -replace '\$\(ExpectedSQLPatch\)', $expectedPatch
             try {
-              Invoke-DbaQuery -SqlInstance $instance -Query $query -EnableException
+              $results = Invoke-DbaQuery -SqlInstance $instance -Query $query -EnableException
+              $serverName = $results[0].ServerName
+              $instanceName = $instance -replace '[\\/]', '_'
+              $csvPath = "./Peer check results/PeerCheckResults_${serverName}_${instanceName}_$date.csv"
+              $results | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
+              Write-Host "Results exported to $csvPath"
             } catch {
               Write-Host "Error: Failed to run PeerCheck.SQL on $instance."
               exit 1
