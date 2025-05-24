@@ -26,5 +26,5 @@ jobs:
           $expectedPatch = "${{ github.event.inputs.expectedsqlcupatch }}"
           foreach ($instance in $instances) {
             Write-Host "Running PeerCheck.SQL on $instance with EnvironmentCategory=$envCategory and ExpectedSQLCUPatch=$expectedPatch"
-            sqlcmd -S $instance -i scripts/PeerCheck.SQL -v EnvironmentCategory="$envCategory" ExpectedSQLCUPatch="$expectedPatch"
+            sqlcmd -S $instance -i ./scripts/PeerCheck.SQL -v EnvironmentCategory="$envCategory" ExpectedSQLCUPatch="$expectedPatch"
           }
