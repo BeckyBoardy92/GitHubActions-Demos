@@ -5,7 +5,7 @@
 DECLARE @EnvironmentCategory NVARCHAR(20) = '$(EnvironmentCategory)';
 DECLARE @ExpectedSQLPatch VARCHAR(5) = '$(ExpectedSQLPatch)';
 
-SELECT @@VERSION 
+-- SELECT @@VERSION 
 
 CREATE Table #PeerCheckResults (PeerCheck varchar(255), Results Varchar(max), outcome varchar (50))
 
@@ -213,6 +213,7 @@ BEGIN CATCH
 END CATCH;
 
 
+-- Only output the results table at the end
 select * from #PeerCheckResults
 DROP TABLE #PeerCheckResults
 
